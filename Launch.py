@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 from sys import argv, exit
 from src.ui.CentralWidget import CentralWidget
 
@@ -13,6 +13,7 @@ class Launcher(QtWidgets.QMainWindow):
 
     def initUI(self):
         self.setWindowTitle('LetsTalk')
+        self.setWindowIcon(QtGui.QIcon('/home/yathish/Desktop/LetsTalk/LetsTalk/assets/images/Company-logo.png'))
         self.setGeometry(0, 0, 1366, 720)
         self.show()
 

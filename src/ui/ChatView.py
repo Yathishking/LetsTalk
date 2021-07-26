@@ -2,13 +2,13 @@ import typing
 from PyQt5 import QtWidgets, QtCore, QtGui
 from src.core.Fonts import ButtonFont, MessageFont, ContactNameFont, TimeFont
 from src.core.emoji import EmojiPicker
+from .MessageWidgets import MessageWidget, FileWidget
 
 
 class ChatView(QtWidgets.QStackedWidget):
     def __init__(self, parent: QtWidgets.QWidget):
         super(ChatView, self).__init__(parent)
         self.setObjectName('chatview')
-        self.addView()
         self.initStyles()
 
     def initStyles(self):
@@ -17,9 +17,57 @@ class ChatView(QtWidgets.QStackedWidget):
             border-radius: 4px;    
         """)
 
-    def addView(self):
-        view = ChatWidget()
-        self.addWidget(view)
+    def addView(self, contactInfo):
+        view = ChatWidget(contactInfo)
+        index = self.addWidget(view)
+        return index
+
+
+class ChatWidget(QtWidgets.QWidget):
+    def __init__(self, contactinfo):
+        super().__init__()
+        self.contactInfo = contactinfo
+        self.vlayout = QtWidgets.QVBoxLayout(self)
+        self.chatwidgetheader = ChatWidgetHeader(self)
+        self.chatwidgetheader.initContactInfo(contactinfo)
+        self.chatwidgetbody = ChatWidgetBody(self)
+        self.chatwidgetfooter = ChatWidgetFooter(self)
+        self.initLayout()
+        self.signalLinker()
+
+    def initLayout(self):
+        self.vlayout.addWidget(self.chatwidgetheader, 0)
+        self.vlayout.addWidget(self.chatwidgetbody, 8)
+        self.vlayout.addWidget(self.chatwidgetfooter, 0, QtCore.Qt.AlignBottom)
+        self.setLayout(self.vlayout)
+
+    def signalLinker(self):
+        self.chatwidgetfooter.sendButton.clicked.connect(self.sendMessage)
+        self.chatwidgetfooter.attachmentOption.clicked.connect(self.attachFile)
+
+    def keyPressEvent(self, a0: QtGui.QKeyEvent) -> None:
+        if a0.key() == QtCore.Qt.Key_Return:
+            self.sendMessage()
+
+    def sendMessage(self):
+        message = self.chatwidgetfooter.messageInput.text()
+        if message == '':
+            return
+        else:
+            self.chatwidgetbody.addWidget(message)
+            self.chatwidgetfooter.messageInput.clear()
+            self.chatwidgetfooter.messageInput.focusWidget()
+            return
+
+    def attachFile(self):
+        filepath = QtWidgets.QFileDialog.getOpenFileName()[0]
+        if filepath != '':
+            fileinfo = QtCore.QFileInfo(filepath)
+            self.chatwidgetbody.addFileWidget(fileinfo)
+            self.chatwidgetfooter.messageInput.focusWidget()
+        else:
+            return
+
 
 
 class ChatWidgetBody(QtWidgets.QListWidget):
@@ -46,11 +94,21 @@ class ChatWidgetBody(QtWidgets.QListWidget):
         self.setItemWidget(listItem, message)
         self.setCurrentItem(listItem)
 
+    def addFileWidget(self, fileInfo: QtCore.QFileInfo):
+        listItem = QtWidgets.QListWidgetItem()
+        file = FileWidget()
+        file.setFileInfo(fileInfo)
+        listItem.setSizeHint(file.sizeHint())
+        self.addItem(listItem)
+        self.setItemWidget(listItem, file)
+        self.setCurrentItem(listItem)
+
 
 class ChatWidgetHeader(QtWidgets.QWidget):
     def __init__(self, parent: QtWidgets.QWidget):
         super().__init__(parent)
         self.setObjectName('chatwidgetheader')
+        self.contactInfo = ''
         self.hlayout = QtWidgets.QHBoxLayout(self)
         self.ContactPic = QtWidgets.QLabel()
         self.ContactName = QtWidgets.QLabel('Vincent Kapor')
@@ -58,6 +116,10 @@ class ChatWidgetHeader(QtWidgets.QWidget):
         self.setupObjects()
         self.initLayout()
         self.initStyles()
+
+    def initContactInfo(self, contactInfo):
+        self.contactInfo = contactInfo
+        self.ContactName.setText(self.contactInfo.contactName)
 
     def setupObjects(self):
         newIcon = QtGui.QIcon('/home/yathish/Desktop/LetsTalk/LetsTalk/assets/images/contact-outline.png')
@@ -97,9 +159,10 @@ class ChatWidgetHeader(QtWidgets.QWidget):
 class ChatWidgetFooter(QtWidgets.QWidget):
     def __init__(self, parent):
         super(ChatWidgetFooter, self).__init__(parent)
+        self.emojiPicker = EmojiPicker()
         self.hlayout = QtWidgets.QHBoxLayout(self)
         self.emojiOption = QtWidgets.QPushButton()
-        self.emojiPicker = EmojiPicker()
+        self.attachmentOption = QtWidgets.QPushButton()
         self.messageInput = QtWidgets.QLineEdit()
         self.sendButton = QtWidgets.QPushButton('Send')
         self.setupObjects()
@@ -114,7 +177,9 @@ class ChatWidgetFooter(QtWidgets.QWidget):
         self.emojiOption.setObjectName('emojioption')
         self.messageInput.setObjectName('messageinput')
         self.sendButton.setObjectName('sendbutton')
+        self.attachmentOption.setObjectName('attachfile')
         self.emojiOption.setIcon(QtGui.QIcon('/home/yathish/Desktop/LetsTalk/LetsTalk/assets/images/emoji.png'))
+        self.attachmentOption.setIcon(QtGui.QIcon('/home/yathish/Desktop/LetsTalk/LetsTalk/assets/images/attachfile-white.png'))
         self.sendButton.setIcon(QtGui.QIcon('/home/yathish/Desktop/LetsTalk/LetsTalk/assets/images/send.png'))
         self.emojiOption.setIconSize(QtCore.QSize(23, 23))
         self.emojiPicker.setMessageInputWidget(self.messageInput)
@@ -122,6 +187,7 @@ class ChatWidgetFooter(QtWidgets.QWidget):
 
     def initLayout(self):
         self.hlayout.addWidget(self.emojiOption, 0, QtCore.Qt.AlignLeft)
+        self.hlayout.addWidget(self.attachmentOption, 0, QtCore.Qt.AlignLeft)
         self.hlayout.addWidget(self.messageInput, 10)
         self.hlayout.addWidget(self.sendButton, 0, QtCore.Qt.AlignRight)
         qwidget = QtWidgets.QWidget()
@@ -161,76 +227,12 @@ class ChatWidgetFooter(QtWidgets.QWidget):
                 padding: 5px;
                 border-radius: 4px;
             }
+            QPushButton#attachfile{
+                color: dodgerblue;
+                border: none;
+                background-color: #212121;
+                padding: 5px;
+                border-radius: 4px;
+            }
         """)
-
-
-class ChatWidget(QtWidgets.QWidget):
-    def __init__(self):
-        super().__init__()
-        self.vlayout = QtWidgets.QVBoxLayout(self)
-        self.chatwidgetheader = ChatWidgetHeader(self)
-        self.chatwidgetbody = ChatWidgetBody(self)
-        self.chatwidgetfooter = ChatWidgetFooter(self)
-        self.initLayout()
-        self.signalLinker()
-
-    def initLayout(self):
-        self.vlayout.addWidget(self.chatwidgetheader, 0)
-        self.vlayout.addWidget(self.chatwidgetbody, 8)
-        self.vlayout.addWidget(self.chatwidgetfooter, 0, QtCore.Qt.AlignBottom)
-        self.setLayout(self.vlayout)
-
-    def signalLinker(self):
-        self.chatwidgetfooter.sendButton.clicked.connect(self.sendMessage)
-
-    def keyPressEvent(self, a0: QtGui.QKeyEvent) -> None:
-        if a0.key() == QtCore.Qt.Key_Return:
-            self.sendMessage()
-
-    def sendMessage(self):
-        message = self.chatwidgetfooter.messageInput.text()
-        if message == '':
-            return
-        else:
-            self.chatwidgetbody.addWidget(message)
-            self.chatwidgetfooter.messageInput.clear()
-            self.chatwidgetfooter.messageInput.focusWidget()
-            return
-
-
-class MessageWidget(QtWidgets.QWidget):
-    def __init__(self):
-        super().__init__()
-        self.hlayout = QtWidgets.QHBoxLayout(self)
-        self.mainWidget = QtWidgets.QWidget(self)
-        self.mainWidget.setStyleSheet("""
-        background-color: dodgerblue;
-        color: white;
-        border-radius: 10px;
-        border-top-right-radius: 0;
-        """)
-        messageFont = MessageFont()
-        timefont = TimeFont()
-        self.nhlayout = QtWidgets.QHBoxLayout(self.mainWidget)
-        self.textMSGLabel = QtWidgets.QLabel('hello', self)
-        self.textMSGLabel.setFont(messageFont)
-        self.timeSentLabel = QtWidgets.QLabel("12:00", self)
-        self.timeSentLabel.setFont(timefont)
-        self.textMessage: typing.Any = ''
-        self.timeSent: typing.Any = ''
-        self.initLayout()
-
-    def setMessage(self, message: str):
-        if message == '':
-            return
-        self.textMessage = message
-
-    def initLayout(self):
-        self.nhlayout.addWidget(self.textMSGLabel)
-        self.nhlayout.addWidget(self.timeSentLabel)
-        self.mainWidget.resize(self.textMSGLabel.sizeHint())
-        self.mainWidget.setLayout(self.nhlayout)
-        self.hlayout.addWidget(self.mainWidget, 1, QtCore.Qt.AlignRight)
-        self.setLayout(self.hlayout)
-        self.nhlayout.setContentsMargins(10, 5, 3, 5)
 

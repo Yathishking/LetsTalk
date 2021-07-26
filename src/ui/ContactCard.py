@@ -1,13 +1,16 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from src.core.Fonts import Heading, TimeFont, ContactListFont
+from src.core.DataInfo import ContactInfo
 
 
 class ContactCard(QtWidgets.QWidget):
     def __init__(self, parent):
         super(ContactCard, self).__init__(parent)
         self.hlayout = QtWidgets.QHBoxLayout(self)
+        self.index = None
         self.contactImage = QtWidgets.QLabel()
         self.contactInfo = QtWidgets.QWidget()
+        self.contactDataInfo = ContactInfo()
         self.contactName = QtWidgets.QLabel('Vincent Kapor')
         self.latestTextMessage = QtWidgets.QLabel('Hello')
         self.vlayout = QtWidgets.QVBoxLayout(self.contactInfo)
@@ -16,6 +19,11 @@ class ContactCard(QtWidgets.QWidget):
         self.setupObjects()
         self.initLayout()
         self.initStyles()
+
+    def initContactInfo(self, id, contactName: str):
+        self.contactDataInfo.contactName = contactName
+        self.contactDataInfo.contactID = id
+        self.contactName.setText(contactName)
 
     def setupObjects(self):
         lastseenlabelfont = TimeFont()

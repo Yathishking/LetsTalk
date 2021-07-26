@@ -16,6 +16,20 @@ class CentralWidget(QtWidgets.QWidget):
         self.chatview = ChatView(self)
         self.initLayout()
         self.initStyles()
+        self.signaLinker()
+
+    def signaLinker(self):
+        self.contactslist.itemClicked.connect(self.initChatView)
+
+    def initChatView(self, item: QtWidgets.QListWidgetItem):
+        widget = self.contactslist.itemWidget(item)
+        if widget.index is not None:
+            self.chatview.setCurrentIndex(widget.index)
+            return
+        index = self.chatview.addView(widget.contactDataInfo)
+        widget.index = index
+        self.chatview.setCurrentIndex(index)
+
 
     def initLayout(self):
         self.mainview.setMaximumWidth(300)

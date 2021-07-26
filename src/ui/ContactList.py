@@ -1,6 +1,13 @@
 from PyQt5 import QtWidgets, QtCore
 from .ContactCard import ContactCard
 
+contactInfoList = [{
+  "id": 1,
+  "contactName": "Jessy"
+}, {
+  "id": 2,
+  "contactName": "Jones"
+}]
 
 class ContactList(QtWidgets.QListWidget):
     def __init__(self, parent: QtWidgets.QWidget):
@@ -9,21 +16,25 @@ class ContactList(QtWidgets.QListWidget):
         self.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.setFocusPolicy(QtCore.Qt.NoFocus)
         self.initStyles()
-        self.addContactTOList()
-        self.addContactTOList()
+        self.initContacts()
 
-    def addContactTOList(self):
+    def initContacts(self):
+        for i in contactInfoList:
+            self.addContactTOList(i)
+
+    def addContactTOList(self, contactInfo):
         listItem = QtWidgets.QListWidgetItem()
         contactCard = ContactCard(self)
+        contactCard.initContactInfo(contactInfo['id'], contactInfo['contactName'])
         listItem.setSizeHint(contactCard.sizeHint())
         self.addItem(listItem)
         self.setItemWidget(listItem, contactCard)
 
     def initStyles(self):
         self.setStyleSheet("""
-        QWidget#contactlist{
+        QListWidget#contactlist{
             border-radius: 4px;
-            border: 2px solid #212121;
-        }  
+            border: none;
+        } 
         """)
 

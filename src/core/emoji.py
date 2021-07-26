@@ -1,23 +1,25 @@
-import json, sys
+import json
+import sys
 import typing
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 fp = open('/home/yathish/Desktop/LetsTalk/LetsTalk/assets/vendor/emoji.json', 'r')
 value: typing.List[typing.Dict] = json.loads(fp.read())
-print(value.__len__())
 row = 0
 column = 0
+
 
 class EmojiPicker(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.rowCount = value.__len__() / 15
         self.columnCount = 15
+        self.gridlayout = QtWidgets.QGridLayout()
+        self.qwidget = QtWidgets.QWidget()
         self.setMessageInput = QtWidgets.QLineEdit()
         self.vlayout = QtWidgets.QVBoxLayout()
         self.scrollArea = QtWidgets.QScrollArea(self)
-        self.gridlayout = QtWidgets.QGridLayout()
         self.initLayout()
         self.show()
 
@@ -25,10 +27,9 @@ class EmojiPicker(QtWidgets.QWidget):
         self.setMessageInput = messageInput
 
     def initLayout(self):
-        qwidget = QtWidgets.QWidget()
-        qwidget.setLayout(self.gridlayout)
+        self.qwidget.setLayout(self.gridlayout)
         self.initEmojis()
-        self.scrollArea.setWidget(qwidget)
+        self.scrollArea.setWidget(self.qwidget)
         self.vlayout.addWidget(self.scrollArea)
         self.setLayout(self.vlayout)
 
@@ -46,6 +47,7 @@ class EmojiPicker(QtWidgets.QWidget):
                 column = 0
             else:
                 column = column + 1
+
 
     def addToMessageInput(self, emoji: str):
         self.setMessageInput.setText(f"{self.setMessageInput.text()} {emoji}")
