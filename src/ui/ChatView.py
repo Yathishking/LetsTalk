@@ -2,6 +2,7 @@ import typing
 from PyQt5 import QtWidgets, QtCore, QtGui
 from src.core.Fonts import ButtonFont, MessageFont, ContactNameFont, TimeFont
 from src.core.emoji import EmojiPicker
+from src.core.FileOperations import getFileInfo
 from .MessageWidgets import MessageWidget, FileWidget
 
 
@@ -60,14 +61,9 @@ class ChatWidget(QtWidgets.QWidget):
             return
 
     def attachFile(self):
-        filepath = QtWidgets.QFileDialog.getOpenFileName()[0]
-        if filepath != '':
-            fileinfo = QtCore.QFileInfo(filepath)
-            self.chatwidgetbody.addFileWidget(fileinfo)
-            self.chatwidgetfooter.messageInput.focusWidget()
-        else:
-            return
-
+        fileinfo = getFileInfo()
+        self.chatwidgetbody.addFileWidget(fileinfo)
+        self.chatwidgetfooter.messageInput.focusWidget()
 
 
 class ChatWidgetBody(QtWidgets.QListWidget):
@@ -179,7 +175,8 @@ class ChatWidgetFooter(QtWidgets.QWidget):
         self.sendButton.setObjectName('sendbutton')
         self.attachmentOption.setObjectName('attachfile')
         self.emojiOption.setIcon(QtGui.QIcon('/home/yathish/Desktop/LetsTalk/LetsTalk/assets/images/emoji.png'))
-        self.attachmentOption.setIcon(QtGui.QIcon('/home/yathish/Desktop/LetsTalk/LetsTalk/assets/images/attachfile-white.png'))
+        self.attachmentOption.setIcon(
+            QtGui.QIcon('/home/yathish/Desktop/LetsTalk/LetsTalk/assets/images/attachfile-white.png'))
         self.sendButton.setIcon(QtGui.QIcon('/home/yathish/Desktop/LetsTalk/LetsTalk/assets/images/send.png'))
         self.emojiOption.setIconSize(QtCore.QSize(23, 23))
         self.emojiPicker.setMessageInputWidget(self.messageInput)

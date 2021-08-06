@@ -9,6 +9,7 @@ class ChatInfo:
         self.chatinfo = ''
         self.contactinfo = ContactInfo()
 
+
 class FileInfo:
     def __init__(self):
         self.filename = ''

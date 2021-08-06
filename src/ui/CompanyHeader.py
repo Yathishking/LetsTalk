@@ -29,9 +29,9 @@ class CompanyHeader(QtWidgets.QWidget):
         self.menu.clicked.connect(self.handleMenuClick)
 
     def initLayout(self):
-        self.hlayout.addWidget(self.searchLabel, 0, QtCore.Qt.AlignLeft)
-        self.hlayout.addWidget(self.companyNameLabel, 10, QtCore.Qt.AlignLeft)
         self.hlayout.addWidget(self.menu, 0, QtCore.Qt.AlignRight)
+        self.hlayout.addWidget(self.companyNameLabel, 10, QtCore.Qt.AlignLeft)
+        self.hlayout.addWidget(self.searchLabel, 0, QtCore.Qt.AlignLeft)
 
     def paintEvent(self, a0: QtGui.QPaintEvent) -> None:
         opt = QtWidgets.QStyleOption()

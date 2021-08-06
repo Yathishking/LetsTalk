@@ -1,9 +1,13 @@
 class ThemeEngine:
-    def __init__(self):
+    def __init__(self, parent):
+        self.parent = parent
         pass
 
     def initTheme(self):
-        pass
+        self.parent.setStyleSheet("""
+            color: whitesmoke;
+            background: #212121;
+        """)
 
     def removeTheme(self):
         pass

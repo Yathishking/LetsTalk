@@ -5,7 +5,6 @@ class ApplicationNetwork:
     def __init__(self):
         self.networkManager = QtNetwork.QNetworkAccessManager()
         self.request = QtNetwork.QNetworkRequest()
-        self.reply = QtNetwork.QNetworkReply()
 
     def sendRequest(self):
         self.request.setUrl(QtCore.QUrl('http://localhost:8000'))

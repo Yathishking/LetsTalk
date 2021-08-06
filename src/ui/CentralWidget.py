@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets
 from .ContactList import ContactList
 from .ChatView import ChatView
 from .CompanyHeader import CompanyHeader
+from .Authentication import Authentication
 
 
 class CentralWidget(QtWidgets.QWidget):
@@ -14,8 +15,8 @@ class CentralWidget(QtWidgets.QWidget):
         self.companyHeader = CompanyHeader(self.mainview)
         self.contactslist = ContactList(self)
         self.chatview = ChatView(self)
-        self.initLayout()
         self.initStyles()
+        self.initLayout()
         self.signaLinker()
 
     def signaLinker(self):
@@ -29,7 +30,6 @@ class CentralWidget(QtWidgets.QWidget):
         index = self.chatview.addView(widget.contactDataInfo)
         widget.index = index
         self.chatview.setCurrentIndex(index)
-
 
     def initLayout(self):
         self.mainview.setMaximumWidth(300)
