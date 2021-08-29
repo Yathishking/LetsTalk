@@ -19,7 +19,7 @@ class Launcher(QtWidgets.QMainWindow):
 
     def initAppComponents(self):
         appDataBase = AppDataBase()
-        auth = Authentication(self)
+        # auth = Authentication(self)
         appNetworkManager = ApplicationNetwork()
         extensionManager = Extensions()
         themeEngine = ThemeEngine(self)

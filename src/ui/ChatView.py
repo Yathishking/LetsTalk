@@ -4,6 +4,7 @@ from src.core.Fonts import ButtonFont, MessageFont, ContactNameFont, TimeFont
 from src.core.emoji import EmojiPicker
 from src.core.FileOperations import getFileInfo
 from .MessageWidgets import MessageWidget, FileWidget
+from Test import test
 
 
 class ChatView(QtWidgets.QStackedWidget):
@@ -66,38 +67,44 @@ class ChatWidget(QtWidgets.QWidget):
         self.chatwidgetfooter.messageInput.focusWidget()
 
 
-class ChatWidgetBody(QtWidgets.QListWidget):
+class ChatWidgetBody(QtWidgets.QScrollArea):
     def __init__(self, parent):
         super().__init__(parent)
-        self.setObjectName('chatwidgetbody')
-        self.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
-        self.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.initStyles()
+        self.topwidget = QtWidgets.QWidget()
+        self.vlayout = QtWidgets.QVBoxLayout()
+        self.topwidget.setLayout(self.vlayout)
+        self.vlayout.setAlignment(QtCore.Qt.AlignBottom)
+        self.vlayout.setSpacing(0)
+        self.vlayout.setContentsMargins(10, 0, 10, 0)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.addWidget(alignment=QtCore.Qt.AlignLeft)
+        self.setWidget(self.topwidget)
+        self.setWidgetResizable(True)
+        self.scrollbar = self.verticalScrollBar()
+        self.scrollbar.rangeChanged.connect(self.moveScrollToBottom)
 
-    def initStyles(self):
-        self.setStyleSheet("""
-            QListWidget#chatwidgetbody{
-                border-top: 2px solid #212121;   
-            }
-        """)
-
-    def addWidget(self, text: str = 'Hello'):
-        listItem = QtWidgets.QListWidgetItem()
+    def addWidget(self, text: str = 'Hello', alignment: QtCore.Qt.AlignmentFlag = QtCore.Qt.AlignRight):
         message = MessageWidget()
+        message.setAlignment(alignment)
         message.textMSGLabel.setText(text)
-        listItem.setSizeHint(message.sizeHint())
-        self.addItem(listItem)
-        self.setItemWidget(listItem, message)
-        self.setCurrentItem(listItem)
+        hlayout = QtWidgets.QHBoxLayout()
+        hlayout.addWidget(message, 0, alignment)
+        hlayout.setSpacing(0)
+        hlayout.setContentsMargins(0, 0, 0, 0)
+        self.vlayout.addLayout(hlayout)
 
-    def addFileWidget(self, fileInfo: QtCore.QFileInfo):
-        listItem = QtWidgets.QListWidgetItem()
+    def addFileWidget(self, fileInfo: QtCore.QFileInfo, alignment: QtCore.Qt.AlignmentFlag = QtCore.Qt.AlignRight):
         file = FileWidget()
+        file.setAlignment(alignment)
         file.setFileInfo(fileInfo)
-        listItem.setSizeHint(file.sizeHint())
-        self.addItem(listItem)
-        self.setItemWidget(listItem, file)
-        self.setCurrentItem(listItem)
+        hlayout = QtWidgets.QHBoxLayout()
+        hlayout.addWidget(file, 0, alignment)
+        hlayout.setSpacing(0)
+        hlayout.setContentsMargins(0, 0, 0, 0)
+        self.vlayout.addLayout(hlayout)
+
+    def moveScrollToBottom(self, minvalue, maxvalue):
+        self.verticalScrollBar().setValue(maxvalue)
 
 
 class ChatWidgetHeader(QtWidgets.QWidget):
